@@ -21,12 +21,13 @@ bool parseHighFrequencyTradingConfig(const char* thePath, HighFrequencyTradingCo
         std::string theFullPath(thePath);
         boost::property_tree::json_parser::read_json(theFullPath, pt);
 
-        conf.login.ip       =  pt.get<std::string>("logIn.ip");
-        conf.login.port     =  pt.get<int>("logIn.port");
-        conf.login.user     =  pt.get<std::string>("logIn.user");
-        conf.login.password =  pt.get<std::string>("logIn.password");
-        conf.login.txPass   =  pt.get<std::string>("logIn.txPass");
-        conf.login.yyb      =  pt.get<std::string>("logIn.yyb");
+        conf.login.ip           =  pt.get<std::string>("logIn.ip");
+        conf.login.port         =  pt.get<int>("logIn.port");
+        conf.login.user         =  pt.get<std::string>("logIn.user");
+        conf.login.password     =  pt.get<std::string>("logIn.password");
+        conf.login.txPass       =  pt.get<std::string>("logIn.txPass");
+        conf.login.yyb          =  pt.get<std::string>("logIn.yyb");
+        conf.login.timeInterval =  pt.get<int>("logIn.timeInterval");
 
 
 

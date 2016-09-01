@@ -9,7 +9,8 @@
 
 #include "boost/thread/thread.hpp"
 #include "boost/bind.hpp"
-
+#include "boost/date_time/posix_time/posix_time.hpp"
+#include "boost/thread/thread.hpp" 
 
 
 // ------------------------------------------------------------------------------------------
@@ -130,6 +131,7 @@ int main(int argc, char* argv[])
         for (int j = 0; j < g_highFrequencyTradingConfig.tradingInfoes[i].threadNum; ++j)
         {
             group.create_thread(boost::bind(&runHighFrequencyTrading, i, j));
+            boost::this_thread::sleep(boost::posix_time::microseconds(g_highFrequencyTradingConfig.login.timeInterval));
         }
     }
 

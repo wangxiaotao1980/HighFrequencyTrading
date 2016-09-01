@@ -22,6 +22,7 @@ struct HighFrequencyTradingLogIn
     std::string                 password;
     std::string                 txPass;
     std::string                 yyb;
+    int                         timeInterval;
 };
 
 
