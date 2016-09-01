@@ -20,7 +20,7 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
-log/
+# [Ll]og/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -103,7 +103,7 @@ _ReSharper*/
 # JustCode is a .NET coding add-in
 .JustCode
 
-# TeamCity is a build add-in
+# TeamCity is a build add-in[]
 _TeamCity*
 
 # DotCover is a Code Coverage Tool
