@@ -8,25 +8,41 @@
 
 /*******************************************************************************************/
 #include <string>
+#include <vector>
 /**
  * The class <code>HighFrequencyTradingConfig</code>
  *
  */
-struct HighFrequencyTradingConfig
+
+struct HighFrequencyTradingLogIn
 {
-    int                         threadNum;
-    int                         requestNum;
-    std::string                 ip; 
+    std::string                 ip;
     int                         port;
     std::string                 user;
     std::string                 password;
     std::string                 txPass;
     std::string                 yyb;
+};
+
+
+struct HighFrequencyTradingInfo
+{
+    int                         threadNum;
+    int                         requestNum;
     int                         fx;
     std::string                 gddm;
     std::string                 gpdm;
     int                         quantity;
     float                       price;
+};
+
+
+
+struct HighFrequencyTradingConfig
+{
+    HighFrequencyTradingLogIn                login;
+    std::vector<HighFrequencyTradingInfo>    tradingInfoes;
+
 };                              
 
 bool parseHighFrequencyTradingConfig(const char* thePath, HighFrequencyTradingConfig& conf);

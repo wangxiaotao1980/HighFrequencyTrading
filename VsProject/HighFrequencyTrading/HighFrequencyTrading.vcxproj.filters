@@ -52,7 +52,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="conf\HighFrequencyTrading.conf">
+    <None Include="..\..\conf\HighFrequencyTrading.conf">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

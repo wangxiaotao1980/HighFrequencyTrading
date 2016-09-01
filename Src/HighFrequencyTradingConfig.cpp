@@ -7,6 +7,7 @@
 
 #include "Log/Log.h"
 
+#include "boost/foreach.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 
@@ -19,20 +20,32 @@ bool parseHighFrequencyTradingConfig(const char* thePath, HighFrequencyTradingCo
     {
         std::string theFullPath(thePath);
         boost::property_tree::json_parser::read_json(theFullPath, pt);
-        conf.threadNum   = pt.get<int>("threadNum");
-        conf.requestNum  = pt.get<int>("requestNum");
-        conf.ip          = pt.get<std::string>("ip");
-        conf.port        = pt.get<int>("port");
-        conf.user        = pt.get<std::string>("user");
-        conf.password    = pt.get<std::string>("password");
-        conf.txPass      = pt.get<std::string>("txPass");
-        conf.fx          = pt.get<int>("fx");
-        conf.yyb         = pt.get<std::string>("yyb");
-        conf.gddm        = pt.get<std::string>("gddm");
-        conf.gpdm        = pt.get<std::string>("gpdm");
-        conf.quantity    = pt.get<int>("quantity");
-        conf.price       = pt.get<float>("price");
 
+        conf.login.ip       =  pt.get<std::string>("logIn.ip");
+        conf.login.port     =  pt.get<int>("logIn.port");
+        conf.login.user     =  pt.get<std::string>("logIn.user");
+        conf.login.password =  pt.get<std::string>("logIn.password");
+        conf.login.txPass   =  pt.get<std::string>("logIn.txPass");
+        conf.login.yyb      =  pt.get<std::string>("logIn.yyb");
+
+
+
+
+        BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("transactionItems"))
+        {
+            HighFrequencyTradingInfo tradingInfo;
+
+            tradingInfo.threadNum   = v.second.get<int>("threadNum");
+            tradingInfo.requestNum  = v.second.get<int>("requestNum");
+            tradingInfo.fx          = v.second.get<int>("fx");
+            tradingInfo.gddm        = v.second.get<std::string>("gddm");
+            tradingInfo.gpdm        = v.second.get<std::string>("gpdm");
+            tradingInfo.quantity    = v.second.get<int>("quantity");
+            tradingInfo.price       = v.second.get<float>("price");
+
+            conf.tradingInfoes.push_back(tradingInfo);
+
+        }
     }
     catch (std::runtime_error& e)
     {

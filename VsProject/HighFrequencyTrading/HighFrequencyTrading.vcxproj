@@ -96,7 +96,7 @@
     <ClInclude Include="..\..\Src\Log\Log.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="conf\HighFrequencyTrading.conf" />
+    <None Include="..\..\conf\HighFrequencyTrading.conf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

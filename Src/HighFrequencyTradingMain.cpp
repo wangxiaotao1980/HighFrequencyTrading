@@ -20,11 +20,9 @@ JL_Login      g_pJLLogin      = NULL;
 JL_SendOrder  g_pJLSendOrder  = NULL;
 
 
-void runHighFrequencyTrading(const int n)
+void runHighFrequencyTrading(const int tradingInfoesNum, const int n)
 {
-    int num = g_highFrequencyTradingConfig.requestNum;
-
-
+    int num = g_highFrequencyTradingConfig.tradingInfoes[tradingInfoesNum].requestNum;
 
     for (int i = 0; i < num; ++i)
     {
@@ -32,24 +30,25 @@ void runHighFrequencyTrading(const int n)
             = boost::chrono::high_resolution_clock::now();
         char* result = g_pJLSendOrder
             (
-                g_highFrequencyTradingConfig.fx,
-                const_cast<char*>(g_highFrequencyTradingConfig.user.c_str()),
-                const_cast<char*>(g_highFrequencyTradingConfig.gddm.c_str()),
-                const_cast<char*>(g_highFrequencyTradingConfig.gpdm.c_str()),
-                g_highFrequencyTradingConfig.quantity,
-                g_highFrequencyTradingConfig.price
+                              g_highFrequencyTradingConfig.tradingInfoes[tradingInfoesNum].fx,
+            const_cast<char*>(g_highFrequencyTradingConfig.login.user.c_str()),
+            const_cast<char*>(g_highFrequencyTradingConfig.tradingInfoes[tradingInfoesNum].gddm.c_str()),
+            const_cast<char*>(g_highFrequencyTradingConfig.tradingInfoes[tradingInfoesNum].gpdm.c_str()),
+                              g_highFrequencyTradingConfig.tradingInfoes[tradingInfoesNum].quantity,
+                              g_highFrequencyTradingConfig.tradingInfoes[tradingInfoesNum].price
             );
         boost::chrono::time_point<boost::chrono::high_resolution_clock> timeEnd
             = boost::chrono::high_resolution_clock::now();
 
         HIS_LOG_INFO(
-            "threadNum:" << n <<
-            "|count:" << i << 
-            "|time:" << boost::chrono::duration_cast<boost::chrono::milliseconds>(timeEnd - timeBegin).count() << 
+            "tradingInfoesNum:" << tradingInfoesNum <<
+            "|threadNum:" << n <<
+            "|count:" << i <<
+            "|time:" << boost::chrono::duration_cast<boost::chrono::milliseconds>(timeEnd - timeBegin).count() <<
             "|result:" << result);
 
     }
-} 
+}
 
 
 
@@ -108,12 +107,12 @@ int main(int argc, char* argv[])
     
     int res = g_pJLLogin
                     (
-                        const_cast<char*>(g_highFrequencyTradingConfig.ip.c_str()),
-                        g_highFrequencyTradingConfig.port,
-                        const_cast<char*>(g_highFrequencyTradingConfig.user.c_str()),
-                        const_cast<char*>(g_highFrequencyTradingConfig.password.c_str()),
-                        const_cast<char*>(g_highFrequencyTradingConfig.txPass.c_str()),
-                        const_cast<char*>(g_highFrequencyTradingConfig.yyb.c_str())
+                        const_cast<char*>(g_highFrequencyTradingConfig.login.ip.c_str()),
+                        g_highFrequencyTradingConfig.login.port,
+                        const_cast<char*>(g_highFrequencyTradingConfig.login.user.c_str()),
+                        const_cast<char*>(g_highFrequencyTradingConfig.login.password.c_str()),
+                        const_cast<char*>(g_highFrequencyTradingConfig.login.txPass.c_str()),
+                        const_cast<char*>(g_highFrequencyTradingConfig.login.yyb.c_str())
                     );
 
     if (res == 0)
@@ -124,14 +123,14 @@ int main(int argc, char* argv[])
         terminalLog();
     }
 
-
-
-
     boost::thread_group group;
     
-    for (int i = 0; i < g_highFrequencyTradingConfig.threadNum; ++i)
+    for (int i = 0; i < g_highFrequencyTradingConfig.tradingInfoes.size(); ++i)
     {
-        group.create_thread(boost::bind(&runHighFrequencyTrading, i));
+        for (int j = 0; j < g_highFrequencyTradingConfig.tradingInfoes[i].threadNum; ++j)
+        {
+            group.create_thread(boost::bind(&runHighFrequencyTrading, i, j));
+        }
     }
 
     group.join_all();
