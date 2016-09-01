@@ -17,9 +17,9 @@
 //
 
 HighFrequencyTradingConfig g_highFrequencyTradingConfig;
-JL_Login      g_pJLLogin      = NULL;
-JL_SendOrder  g_pJLSendOrder  = NULL;
-
+JL_Login        g_pJLLogin      = NULL;
+JL_SendOrder    g_pJLSendOrder  = NULL;
+LONG volatile*  g_pCount        = NULL;
 
 void runHighFrequencyTrading(const int tradingInfoesNum, const int n)
 {
@@ -41,6 +41,18 @@ void runHighFrequencyTrading(const int tradingInfoesNum, const int n)
         boost::chrono::time_point<boost::chrono::high_resolution_clock> timeEnd
             = boost::chrono::high_resolution_clock::now();
 
+
+        bool bisdigit = true;
+        for (int ii = 0; result[ii] != 0; ++ii)
+        {
+            if (!isdigit(result[ii]))
+            {
+                bisdigit = false;
+                break;
+            }
+        }
+
+
         HIS_LOG_INFO(
             "tradingInfoesNum:" << tradingInfoesNum <<
             "|threadNum:" << n <<
@@ -48,6 +60,29 @@ void runHighFrequencyTrading(const int tradingInfoesNum, const int n)
             "|time:" << boost::chrono::duration_cast<boost::chrono::milliseconds>(timeEnd - timeBegin).count() <<
             "|result:" << result);
 
+
+        if (false == bisdigit) //提交单子不成功
+        {
+            if (0 != ::InterlockedCompareExchange(g_pCount + tradingInfoesNum, 1, 1)) //有单子提交成功
+            {
+                HIS_LOG_INFO(
+                    "tradingInfoesNum:" << tradingInfoesNum <<
+                    "|threadNum:" << n <<
+                    "|count:" << i <<
+                    "|result:" << "thread break");
+                break;
+            }
+
+        }
+        else // 提交单子成功。
+        {
+            if (0 != ::InterlockedCompareExchange(g_pCount + tradingInfoesNum, 1, 0))
+            {
+                // 此刻说明已经有了成功的提交了
+                // 撤单操作
+            }
+            break;
+        }
     }
 }
 
@@ -124,6 +159,13 @@ int main(int argc, char* argv[])
         terminalLog();
     }
 
+
+    g_pCount = new LONG[g_highFrequencyTradingConfig.tradingInfoes.size()];
+    for (int i = 0; i < g_highFrequencyTradingConfig.tradingInfoes.size(); ++i)
+    {
+        g_pCount[i] = 0;
+    }
+
     boost::thread_group group;
     
     for (int i = 0; i < g_highFrequencyTradingConfig.tradingInfoes.size(); ++i)
@@ -137,6 +179,10 @@ int main(int argc, char* argv[])
 
     group.join_all();
     
+
+    delete g_pCount;
+    g_pCount = NULL;
+
     FreeLibrary(hdll);
     terminalLog();
 
